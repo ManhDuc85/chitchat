@@ -25,7 +25,7 @@ export const signup = async (req, res) => {
         }
         // 123456 => dhvhevi$
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password. salt);
+        const hashedPassword = await bcrypt.hash(password.salt);
 
         const newUser = new User ({
             fullname,
@@ -34,8 +34,8 @@ export const signup = async (req, res) => {
         });
 
         if(newUser){
-            generateToken(newUser, __dirname, res);
-            await newUser.save();
+            const savedUser = await newUser.save();
+            generateToken(savedUser, __dirname, res);
 
             res.status(201).json({
                 _id: newUser._id,
