@@ -1,6 +1,8 @@
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../lib/utils.js";
+import { sendWelcomeEmail } from "../emails/emailHandlers.js";
+import "dotenv/config";
 
 export const signup = async (req, res) => {
     const {fullname, email, password} = req.body;
@@ -25,7 +27,7 @@ export const signup = async (req, res) => {
         }
         // 123456 => dhvhevi$
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(password.salt);
+        const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User ({
             fullname,
@@ -35,7 +37,7 @@ export const signup = async (req, res) => {
 
         if(newUser){
             const savedUser = await newUser.save();
-            generateToken(savedUser, __dirname, res);
+            generateToken(savedUser._id, res);
 
             res.status(201).json({
                 _id: newUser._id,
@@ -43,6 +45,13 @@ export const signup = async (req, res) => {
                 email: newUser.email,
                 profilePic: newUser.profilePic,
             });
+
+            try{
+                await sendWelcomeEmail(savedUser.email, savedUser.fullname, process.env.CLIENT_URL);
+            } catch(error){
+                console.error("Failed to send welcome wmail: ", error);
+            }
+
         } else{
             res.status(400).json({message: "Invalid user data"});
         }
