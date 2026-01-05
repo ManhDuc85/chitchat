@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@property --border-angle {
+  inherits: false;
+  initial-value: 0deg;
+  syntax: "<angle>";
+}
+
+* {
+  font-family: 'VT323', monospace;
+}
+
+body {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Minecraft Button Style */
+.mc-button {
+  @apply border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,0.5)] 
+  transition-all active:translate-y-1 active:shadow-[2px_2px_0_rgba(0,0,0,0.5)];
+}
+
+.input {
+  @apply w-full bg-[#1a1a1a] border-4 border-black px-4 py-2 text-white 
+  placeholder-[#a0c7a3] focus:ring-0 focus:border-[#5E8E62] text-2xl;
+  font-family: 'VT323', monospace;
+  text-shadow: 2px 2px 0 rgba(0,0,0,1);
+}
+
+.auth-input-icon {
+  @apply absolute left-3 top-1/2 -translate-y-1/2 text-[#7F7F7F] size-8;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,1));
+}
+
+.auth-input-label {
+  @apply block text-2xl font-medium text-white mb-2;
+  text-shadow: 2px 2px 0 rgba(0,0,0,1);
+}
+
+.auth-badge {
+  @apply inline-flex items-center px-4 py-2 text-xl font-medium
+  bg-[#5E8E62] text-white border-4 border-black shadow-[4px_4px_0_rgba(0,0,0,0.5)];
+  text-shadow: 2px 2px 0 rgba(0,0,0,1);
+}
+
+.auth-btn {
+  @apply w-full bg-[#5E8E62] text-white border-4 border-black py-3 font-medium text-2xl
+  hover:bg-[#6FA073] focus:ring-0 mc-button;
+  text-shadow: 2px 2px 0 rgba(0,0,0,1);
+}
+
+.auth-link {
+  @apply px-6 py-3 inline-block bg-[#8B7355] border-4 border-black text-white
+  hover:bg-[#9B8365] text-xl transition-colors mc-button;
+  text-shadow: 2px 2px 0 rgba(0,0,0,1);
+}
+
+/* Minecraft Window Style */
+.mc-window {
+  @apply border-4 border-black bg-[#C6C6C6];
+  box-shadow: 8px 8px 0px rgba(0,0,0,0.5);
+}
+
+.mc-title-bar {
+  @apply bg-gradient-to-r from-[#8B6F47] to-[#6B5433] border-b-4 border-black;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 16px;
+  background: #1a1a1a;
+  border: 3px solid #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #5E8E62 0%, #4A7C4E 50%, #2F5F2F 100%);
+  border: 4px solid #1a1a1a;
+  box-shadow: inset 2px 2px 3px rgba(255,255,255,0.25), inset -2px -2px 3px rgba(0,0,0,0.4);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #7CAF7E 0%, #5E8E62 50%, #4A7C4E 100%);
+}
+
+/* Minecraft Chat Bubble */
+.chat-bubble {
+  @apply border-4 border-black p-4 text-2xl leading-tight;
+  box-shadow: 6px 6px 0px rgba(26,26,26,0.4);
+  text-shadow: 2px 2px 0 rgba(0,0,0,0.8);
+}
+
+/* Avatar Styles */
+.avatar {
+  @apply border-4 border-black;
+  box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+}
+
+.avatar.online::before {
+  @apply border-4 border-black bg-[#4CAF50];
+  box-shadow: 0 0 0 2px #1a1a1a;
+  animation: pulse 2s infinite;
+}
+
+.avatar.offline::before {
+  @apply border-4 border-black bg-[#666];
+  box-shadow: 0 0 0 2px #1a1a1a;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* Tab Styles */
+.tab {
+  @apply text-2xl font-bold border-4 border-black mc-button;
+  text-shadow: 2px 2px 0 rgba(0,0,0,1);
+}
+
+/* Pixel Perfect Image Rendering */
+img {
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
