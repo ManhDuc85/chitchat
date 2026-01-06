@@ -1,10 +1,11 @@
-import express from "express";
 import dotenv from "dotenv";
+import express from "express";
 import path from "path";
 
+import { connectDB } from "./lib/db.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
-import { connectDB } from "./lib/db.js";
+
 dotenv.config();
 
 const app = express();
@@ -18,16 +19,15 @@ app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
 // Make ready fro deployment
-if(process.env.NODE_ENV === "production"){
-    app.use(express.static(path.join(__dirname, "../frontend/dist")));
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
-    app.get("*", (_, res) => {
-        res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
-    })
+  app.get("*", (_, res) => {
+    res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+  });
 }
 
 app.listen(PORT, () => {
-    console.log("Sever is running on port: " + PORT);
-    connectDB();
-});  
- 
+  console.log("Sever is running on port: " + PORT);
+  connectDB();
+});

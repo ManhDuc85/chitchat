@@ -6,7 +6,9 @@ import User from "../models/User.js";
 export const getAllContacts = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
-    const filteredUsers = await User.find({ _id: { $ne: loggedInUserId } }).select("-password");
+    const filteredUsers = await User.find({
+      _id: { $ne: loggedInUserId },
+    }).select("-password");
 
     res.status(200).json(filteredUsers);
   } catch (error) {
@@ -44,7 +46,9 @@ export const sendMessage = async (req, res) => {
       return res.status(400).json({ message: "Text or image is required." });
     }
     if (senderId.equals(receiverId)) {
-      return res.status(400).json({ message: "Cannot send messages to yourself." });
+      return res
+        .status(400)
+        .json({ message: "Cannot send messages to yourself." });
     }
     const receiverExists = await User.exists({ _id: receiverId });
     if (!receiverExists) {
@@ -98,7 +102,9 @@ export const getChatPartners = async (req, res) => {
       ),
     ];
 
-    const chatPartners = await User.find({ _id: { $in: chatPartnerIds } }).select("-password");
+    const chatPartners = await User.find({
+      _id: { $in: chatPartnerIds },
+    }).select("-password");
 
     res.status(200).json(chatPartners);
   } catch (error) {
