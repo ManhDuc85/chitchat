@@ -29,7 +29,8 @@ export const getMessagesByUserId = async (req, res) => {
     // --- NEW: POPULATE ĐỂ HIỆN THỊ TRÍCH DẪN KHI RELOAD TRANG ---
     .populate({
       path: "replyTo", // Lấy dữ liệu tin nhắn gốc
-      select: "text image senderId", // Chỉ lấy các trường cần thiết để tối ưu hiệu năng
+      select: "text image video file fileName senderId", // Updated to include fileName
+      // select: "text image video file senderId",
       populate: { path: "senderId", select: "fullName" } // Lấy tên người đã gửi tin nhắn gốc đó
     });
 
@@ -42,13 +43,13 @@ export const getMessagesByUserId = async (req, res) => {
 
 export const sendMessage = async (req, res) => {
   try {
-    // Nhận thêm replyToId từ body do Frontend gửi lên
-    const { text, image, replyToId } = req.body;
+    const { text, image, video, file, fileName, replyToId } = req.body;
+    // const { text, image, video, file, replyToId } = req.body;
     const { id: receiverId } = req.params;
     const senderId = req.user._id;
 
-    if (!text && !image) {
-      return res.status(400).json({ message: "Text or image is required." });
+    if (!text && !image && !video && !file) {
+      return res.status(400).json({ message: "Text, image, video or file is required." });
     }
     if (senderId.equals(receiverId)) {
       return res.status(400).json({ message: "Cannot send messages to yourself." });
@@ -60,9 +61,25 @@ export const sendMessage = async (req, res) => {
 
     let imageUrl;
     if (image) {
-      // upload base64 image to cloudinary
       const uploadResponse = await cloudinary.uploader.upload(image);
       imageUrl = uploadResponse.secure_url;
+    }
+
+    let videoUrl;
+    if (video) {
+      const uploadResponse = await cloudinary.uploader.upload(video, {
+        resource_type: "video",
+      });
+      videoUrl = uploadResponse.secure_url;
+    }
+
+    let fileUrl;
+    if (file) {
+      // Use raw for generic files
+      const uploadResponse = await cloudinary.uploader.upload(file, {
+        resource_type: "raw", 
+      });
+      fileUrl = uploadResponse.secure_url;
     }
 
     const newMessage = new Message({
@@ -70,22 +87,33 @@ export const sendMessage = async (req, res) => {
       receiverId,
       text,
       image: imageUrl,
-      replyTo: replyToId || null, // Lưu ID của tin nhắn được phản hồi
+      video: videoUrl,
+      file: fileUrl,
+      fileName: fileName || null, // Save the original filename if provided
+      replyTo: replyToId || null, 
     });
+    // const newMessage = new Message({
+    //   senderId,
+    //   receiverId,
+    //   text,
+    //   image: imageUrl,
+    //   video: videoUrl,
+    //   file: fileUrl,
+    //   replyTo: replyToId || null, 
+    // });
 
     await newMessage.save();
 
     // --- NEW: POPULATE TRƯỚC KHI TRẢ VỀ VÀ BẮN SOCKET ---
-    // Việc này đảm bảo cả người gửi và người nhận thấy ngay box reply mà không cần F5
     const populatedMessage = await Message.findById(newMessage._id).populate({
       path: "replyTo",
-      select: "text image senderId",
+      select: "text image video file fileName senderId",
+      // select: "text image video file senderId",
       populate: { path: "senderId", select: "fullName" }
     });
 
     const receiverSocketId = getReceiverSocketId(receiverId);
     if (receiverSocketId) {
-      // Bắn tin nhắn đã có đầy đủ thông tin trích dẫn qua socket
       io.to(receiverSocketId).emit("newMessage", populatedMessage);
     }
 

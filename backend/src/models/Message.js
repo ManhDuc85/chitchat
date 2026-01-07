@@ -20,8 +20,20 @@ const messageSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    video: {
+      type: String,
+    },
+    file: {
+      type: String,
+    },
+    fileName: {
+      type: String, // Added to store original filename (e.g., "doc.pdf")
+      default: null,
+    },
+    // file: {
+    //   type: String,
+    // },
     // --- NEW: LƯU TRỮ TIN NHẮN ĐƯỢC TRẢ LỜI ---
-    // Trường này tham chiếu đến chính Model Message để tạo cấu trúc trích dẫn
     replyTo: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Message",
