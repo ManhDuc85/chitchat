@@ -6,10 +6,10 @@ import { ENV } from "../lib/env.js";
 import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
-    const {fullname, email, password} = req.body;
-    console.log("test:", fullname, email, password);
+    const {fullName, email, password} = req.body;
+    console.log("test:", fullName, email, password);
     try{
-        if(!fullname || !email || !password){
+        if(!fullName || !email || !password){
             return res.status(400).json({message:"All fields are required"});
         }
 
@@ -31,7 +31,7 @@ export const signup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, salt);
 
         const newUser = new User ({
-            fullname,
+            fullName,
             email,
             password: hashedPassword
         });
@@ -42,13 +42,13 @@ export const signup = async (req, res) => {
 
             res.status(201).json({
                 _id: newUser._id,
-                fullname: newUser.fullname,
+                fullName: newUser.fullName,
                 email: newUser.email,
                 profilePic: newUser.profilePic,
             });
 
             try{
-                await sendWelcomeEmail(savedUser.email, savedUser.fullname, ENV.CLIENT_URL);
+                await sendWelcomeEmail(savedUser.email, savedUser.fullName, ENV.CLIENT_URL);
             } catch(error){
                 console.error("Failed to send welcome wmail: ", error);
             }
@@ -79,7 +79,7 @@ export const login = async (req, res) => {
         generateToken(user._id, res);
         res.status(200).json({
             _id: user._id,
-            fullname: user.fullname,
+            fullName: user.fullName,
             email: user.email,
             profilePic: user.profilePic,
         });
