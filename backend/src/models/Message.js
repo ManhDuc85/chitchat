@@ -1,4 +1,4 @@
-import mongoose from "mongoose"; // Updated file
+import mongoose from "mongoose";
 
 const messageSchema = new mongoose.Schema(
   {
@@ -20,12 +20,25 @@ const messageSchema = new mongoose.Schema(
     image: {
       type: String,
     },
-    // --- ADDED THIS FIELD ---
+    video: {
+      type: String,
+    },
     file: {
       type: String,
+    },
+    fileName: {
+      type: String, // Added to store original filename (e.g., "doc.pdf")
       default: null,
     },
-    // ------------------------
+    // file: {
+    //   type: String,
+    // },
+    // --- NEW: LƯU TRỮ TIN NHẮN ĐƯỢC TRẢ LỜI ---
+    replyTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },
   },
   { timestamps: true }
 );

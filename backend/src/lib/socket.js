@@ -1,8 +1,9 @@
-import { Server } from "socket.io";
-import http from "http";
 import express from "express";
-import { ENV } from "./env.js";
+import http from "http";
+import { Server } from "socket.io";
+
 import { socketAuthMiddleware } from "../middleware/socket.auth.middleware.js";
+import { ENV } from "./env.js";
 
 const app = express();
 const server = http.createServer(app);
@@ -17,7 +18,7 @@ const io = new Server(server, {
 // apply authentication middleware to all socket connections
 io.use(socketAuthMiddleware);
 
-// we will use this function to check if the user is online or not
+// we will use this function to check if tdtiou4udohe user is online or not
 export function getReceiverSocketId(userId) {
   return userSocketMap[userId];
 }

@@ -1,4 +1,4 @@
-import { create } from "zustand"; // Updated Code
+import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
@@ -12,7 +12,6 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
   isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
-
   replyTo: null, 
 
   toggleSound: () => {
@@ -71,25 +70,41 @@ export const useChatStore = create((set, get) => ({
 
     const tempId = `temp-${Date.now()}`;
 
+    // Tạo nội dung tin nhắn reply để hiển thị tạm thời trên UI (Optimistic UI)
     const replyContext = replyTo ? {
       _id: replyTo._id,
       text: replyTo.text,
       image: replyTo.image,
+      video: replyTo.video,
+      file: replyTo.file,
       senderName: replyTo.senderId === authUser._id ? "You" : selectedUser.fullName
     } : null;
 
-    // --- UPDATED OPTIMISTIC MESSAGE ---
     const optimisticMessage = {
       _id: tempId,
       senderId: authUser._id,
       receiverId: selectedUser._id,
       text: messageData.text,
       image: messageData.image,
-      file: messageData.file, // <--- ADDED THIS so it shows immediately
+      video: messageData.video, 
+      file: messageData.file, 
+      fileName: messageData.fileName, // Added optimistic fileName
       replyTo: replyContext, 
       createdAt: new Date().toISOString(),
       isOptimistic: true, 
     };
+    // const optimisticMessage = {
+    //   _id: tempId,
+    //   senderId: authUser._id,
+    //   receiverId: selectedUser._id,
+    //   text: messageData.text,
+    //   image: messageData.image,
+    //   video: messageData.video, 
+    //   file: messageData.file, 
+    //   replyTo: replyContext, 
+    //   createdAt: new Date().toISOString(),
+    //   isOptimistic: true, 
+    // };
 
     set({ 
       messages: [...messages, optimisticMessage],
@@ -135,7 +150,8 @@ export const useChatStore = create((set, get) => ({
 
       if (isSoundEnabled) {
         const notificationSound = new Audio("/sounds/notification.mp3");
-        notificationSound.currentTime = 0; 
+
+        notificationSound.currentTime = 0; // reset to start
         notificationSound.play().catch((e) => console.log("Audio play failed:", e));
       }
     });
