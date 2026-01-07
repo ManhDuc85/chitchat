@@ -1,7 +1,6 @@
 import cookieParser from "cookie-parser";
 import express from "express";
 import path from "path";
-
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { connectDB } from "./lib/db.js";
