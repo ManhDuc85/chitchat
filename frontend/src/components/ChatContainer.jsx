@@ -7,7 +7,7 @@ import MessageInput from "./MessageInput";
 import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
 import FloatingParticles from "./FloatingParticles";
 import TypingIndicator from "./TypingIndicator";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Reply } from "lucide-react"; // Import thêm Reply icon
 
 function ChatContainer() {
   const {
@@ -17,6 +17,7 @@ function ChatContainer() {
     isMessagesLoading,
     subscribeToMessages,
     unsubscribeFromMessages,
+    setReplyTo, // Thêm hàm để kích hoạt trạng thái trả lời
   } = useChatStore();
   const { authUser } = useAuthStore();
   
@@ -87,57 +88,81 @@ function ChatContainer() {
               {messages.map((msg) => (
                 <div
                   key={msg._id}
-                  className={`flex w-full ${msg.senderId === authUser._id ? "justify-end" : "justify-start"}`}
+                  className={`flex w-full group ${msg.senderId === authUser._id ? "justify-end" : "justify-start"}`}
                 >
-                  {/* Cửa sổ tin nhắn kiểu Minecraft */}
-                  <div className={`
-                    relative border-4 border-black shadow-mc-lg w-auto max-w-[85%] min-w-[120px]
-                    ${msg.senderId === authUser._id ? "bg-[#5E8E62]" : "bg-[#8B7355]"}
-                  `}>
-                    {/* Thanh tiêu đề tin nhắn */}
+                  {/* Container bao bọc để hiển thị nút Reply khi hover */}
+                  <div className={`flex items-center gap-2 ${msg.senderId === authUser._id ? "flex-row" : "flex-row-reverse"}`}>
+                    
+                    {/* NÚT REPLY KIỂU MINECRAFT - Hiện khi hover */}
+                    <button
+                      onClick={() => setReplyTo(msg)}
+                      className="opacity-0 group-hover:opacity-100 transition-all bg-[#C6C6C6] border-2 border-black p-1 shadow-mc active:translate-y-1 hover:bg-[#DEDEDE]"
+                      title="Reply"
+                    >
+                      <Reply size={16} className="text-black" />
+                    </button>
+
+                    {/* Cửa sổ tin nhắn kiểu Minecraft */}
                     <div className={`
-                      flex items-center justify-between px-3 py-1 border-b-4 border-black
-                      ${msg.senderId === authUser._id ? "bg-[#2F5F2F]" : "bg-[#5C4033]"}
+                      relative border-4 border-black shadow-mc-lg w-auto max-w-[85%] min-w-[120px]
+                      ${msg.senderId === authUser._id ? "bg-[#5E8E62]" : "bg-[#8B7355]"}
                     `}>
-                      <div className="flex items-center gap-2">
-                        <div className="w-4 h-4 border-2 border-black bg-white" />
-                        <span className="text-xl text-white font-bold" style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
-                          {msg.senderId === authUser._id ? "You" : selectedUser.fullName}
+                      {/* Thanh tiêu đề tin nhắn */}
+                      <div className={`
+                        flex items-center justify-between px-3 py-1 border-b-4 border-black
+                        ${msg.senderId === authUser._id ? "bg-[#2F5F2F]" : "bg-[#5C4033]"}
+                      `}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 border-2 border-black bg-white" />
+                          <span className="text-xl text-white font-bold" style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
+                            {msg.senderId === authUser._id ? "You" : selectedUser.fullName}
+                          </span>
+                        </div>
+                        <span className="text-lg text-gray-300 font-mono ml-4">
+                          {new Date(msg.createdAt).toLocaleTimeString(undefined, {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
                         </span>
                       </div>
-                      <span className="text-lg text-gray-300 font-mono ml-4">
-                        {new Date(msg.createdAt).toLocaleTimeString(undefined, {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
-                      </span>
-                    </div>
 
-                    {/* Nội dung tin nhắn */}
-                    <div className="p-4 bg-opacity-90">
-                      {msg.image && (
-                        <img 
-                          src={msg.image} 
-                          alt="Shared" 
-                          className="border-4 border-black mb-2 max-h-64 object-contain shadow-mc" 
-                        />
-                      )}
-                      {msg.text && (
-                        <p className="text-2xl leading-tight text-white break-words whitespace-pre-wrap"
-                          style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
-                          {msg.text}
-                        </p>
-                      )}
+                      {/* Nội dung tin nhắn */}
+                      <div className="p-4 bg-opacity-90">
+                        
+                        {/* HIỂN THỊ NỘI DUNG TRÍCH DẪN (REPLY CONTEXT) - Theme Green */}
+                        {msg.replyTo && (
+                          <div className="mb-3 bg-black/20 border-l-4 border-[#31251B] p-2 text-lg overflow-hidden">
+                            <p className="font-bold text-[#FFD700] mb-0.5" style={{textShadow: '1px 1px 0 rgba(0,0,0,1)'}}>
+                              @{msg.replyTo.senderId?.fullName || msg.replyTo.senderName || "User"}
+                            </p>
+                            <p className="text-white/70 line-clamp-2 italic leading-tight">
+                              {msg.replyTo.text || (msg.replyTo.image ? "Sent an image" : "...") }
+                            </p>
+                          </div>
+                        )}
+
+                        {msg.image && (
+                          <img 
+                            src={msg.image} 
+                            alt="Shared" 
+                            className="border-4 border-black mb-2 max-h-64 object-contain shadow-mc" 
+                          />
+                        )}
+                        {msg.text && (
+                          <p className="text-2xl leading-tight text-white break-words whitespace-pre-wrap"
+                            style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
+                            {msg.text}
+                          </p>
+                        )}
+                      </div>
+                      
+                      <div className="absolute top-1 right-1 w-1 h-1 bg-white opacity-20" />
+                      <div className="absolute bottom-1 left-1 w-1 h-1 bg-black opacity-20" />
                     </div>
-                    
-                    {/* Góc trang trí giả 3D */}
-                    <div className="absolute top-1 right-1 w-1 h-1 bg-white opacity-20" />
-                    <div className="absolute bottom-1 left-1 w-1 h-1 bg-black opacity-20" />
                   </div>
                 </div>
               ))}
               
-              {/* Điểm neo để cuộn xuống đáy */}
               <div ref={messageEndRef} className="h-2" />
             </div>
           ) : isMessagesLoading ? (
@@ -147,8 +172,7 @@ function ChatContainer() {
           )}
         </div>
 
-        {/* TYPING INDICATOR (ABSOLUTE OVERLAY)
-            Luôn nằm cố định ở đáy vùng chat, trên thanh Input */}
+        {/* TYPING INDICATOR (ABSOLUTE OVERLAY) */}
         <div className="absolute bottom-2 left-6 z-20 pointer-events-none">
            <TypingIndicator isTyping={isTyping} />
         </div>
@@ -164,7 +188,6 @@ function ChatContainer() {
         )}
       </div>
 
-      {/* INPUT CỐ ĐỊNH Ở ĐÁY */}
       <MessageInput onTyping={handleTyping} />
     </div>
   );

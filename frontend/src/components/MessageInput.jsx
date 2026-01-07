@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import useKeyboardSound from "../hooks/useKeyboardSound";
 import { useChatStore } from "../store/useChatStore";
+import { useAuthStore } from "../store/useAuthStore"; // Import thêm để xác định tên người reply
 import toast from "react-hot-toast";
 import { Image, Send, X } from "lucide-react";
 
@@ -12,7 +13,9 @@ function MessageInput({ onTyping }) {
   const fileInputRef = useRef(null);
   const typingTimeoutRef = useRef(null);
 
-  const { sendMessage, isSoundEnabled } = useChatStore();
+  // Lấy thêm replyTo và clearReplyTo từ store
+  const { sendMessage, isSoundEnabled, replyTo, clearReplyTo, selectedUser } = useChatStore();
+  const { authUser } = useAuthStore();
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -27,6 +30,8 @@ function MessageInput({ onTyping }) {
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
     if (onTyping) onTyping(false);
+    
+    // Lưu ý: clearReplyTo đã được xử lý bên trong hàm sendMessage của Store để tối ưu UX
   };
 
   const handleInputChange = (e) => {
@@ -60,7 +65,29 @@ function MessageInput({ onTyping }) {
   };
 
   return (
-    <div className="px-6 py-4 border-t-4 border-black bg-[#2F5F2F] shadow-mc w-full">
+    <div className="px-6 py-4 border-t-4 border-black bg-[#2F5F2F] shadow-mc w-full relative">
+      
+      {/* --- NEW: REPLY PREVIEW AREA (Minecraft Sign Style) --- */}
+      {replyTo && (
+        <div className="mb-3 bg-[#A88764] border-4 border-black p-3 flex items-center justify-between shadow-mc animate-in slide-in-from-bottom-2 duration-200">
+          <div className="flex flex-col border-l-4 border-[#5E4433] pl-3 overflow-hidden">
+            <span className="text-[#31251B] text-lg font-bold uppercase tracking-tight" style={{textShadow: 'none'}}>
+              Replying to {replyTo.senderId === authUser._id ? "Yourself" : (selectedUser?.fullName || "Friend")}
+            </span>
+            <p className="text-[#4A3B2C] text-xl truncate italic leading-tight">
+              {replyTo.text || (replyTo.image ? "Attached Image" : "...")}
+            </p>
+          </div>
+          <button
+            onClick={clearReplyTo}
+            className="w-8 h-8 bg-[#D32F2F] border-2 border-black flex items-center justify-center text-white hover:bg-[#E53935] shadow-mc active:translate-y-1"
+            type="button"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+      )}
+
       {imagePreview && (
         <div className="w-full mb-3 flex items-center">
           <div className="relative">

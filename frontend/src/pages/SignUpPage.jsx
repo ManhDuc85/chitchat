@@ -7,7 +7,7 @@ import { Link } from "react-router";
 import { motion } from "framer-motion";
 
 function SignUpPage() {
-  const [formData, setFormData] = useState({ fullname: "", email: "", password: "" });
+  const [formData, setFormData] = useState({ fullName: "", email: "", password: "" });
   const { signup, isSigningUp } = useAuthStore();
 
   const handleSubmit = (e) => {
@@ -64,8 +64,8 @@ function SignUpPage() {
                       <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-6 h-6 text-white z-20" style={{filter: 'drop-shadow(2px 2px 0 rgba(0,0,0,0.5))'}} />
                       <input
                         type="text"
-                        value={formData.fullname}
-                        onChange={(e) => setFormData({ ...formData, fullname: e.target.value })}
+                        value={formData.fullName}
+                        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                         className="w-full bg-[#4A7C4E] border-4 border-black p-3 pl-14 text-white text-xl font-vt323 focus:outline-none focus:border-white shadow-mc-inner placeholder-[#a0c7a3]"
                         placeholder="John Doe"
                         required
