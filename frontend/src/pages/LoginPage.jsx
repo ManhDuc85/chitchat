@@ -28,16 +28,7 @@ function LoginPage() {
         <BorderAnimatedContainer>
           {/* Title Bar */}
           <div className="absolute top-0 left-0 right-0 h-10 bg-gradient-to-r from-[#8B6F47] to-[#6B5433] border-b-4 border-black flex items-center justify-between px-4 z-50">
-            <span className="text-2xl font-bold text-white font-vt323" style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
-              LOGIN.TXT
-            </span>
             <div className="flex gap-2">
-              <div className="w-6 h-6 bg-[#5E8E62] border-2 border-black flex items-center justify-center cursor-pointer hover:brightness-110">
-                <span className="text-white text-lg leading-none">−</span>
-              </div>
-              <div className="w-6 h-6 bg-[#D32F2F] border-2 border-black flex items-center justify-center cursor-pointer hover:brightness-110">
-                <span className="text-white text-lg leading-none">×</span>
-              </div>
             </div>
           </div>
 
@@ -131,7 +122,7 @@ function LoginPage() {
               className="hidden md:w-1/2 md:flex items-center justify-center p-8 bg-gradient-to-bl from-[#4A7C4E] to-[#3A6A3F]"
             >
               <div className="text-center">
-                <div className="border-4 border-black shadow-mc-xl p-4 bg-[#5E8E62] mb-6 relative overflow-hidden">
+                <div className="border-4 border-black shadow-mc-xl p-0 bg-[#5E8E62] mb-6 relative overflow-hidden">
                   <img src="/login.png" alt="Login" className="w-full h-auto object-contain relative z-10" />
                   <div className="absolute inset-0 bg-black/10 z-0" />
                 </div>
