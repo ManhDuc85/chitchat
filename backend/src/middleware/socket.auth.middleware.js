@@ -1,10 +1,10 @@
 import jwt from "jsonwebtoken";
-
 import { ENV } from "../lib/env.js";
 import User from "../models/User.js";
 
 export const socketAuthMiddleware = async (socket, next) => {
   try {
+    console.log("Socket work here");
     // extract token from http-only cookies
     const token = socket.handshake.headers.cookie
       ?.split("; ")
