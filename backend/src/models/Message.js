@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from "mongoose"; // Updated file
 
 const messageSchema = new mongoose.Schema(
   {
@@ -20,6 +20,12 @@ const messageSchema = new mongoose.Schema(
     image: {
       type: String,
     },
+    // --- ADDED THIS FIELD ---
+    file: {
+      type: String,
+      default: null,
+    },
+    // ------------------------
   },
   { timestamps: true }
 );

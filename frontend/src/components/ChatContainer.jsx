@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react"; // Changed code
 import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 import ChatHeader from "./ChatHeader";
@@ -7,7 +7,7 @@ import MessageInput from "./MessageInput";
 import MessagesLoadingSkeleton from "./MessagesLoadingSkeleton";
 import FloatingParticles from "./FloatingParticles";
 import TypingIndicator from "./TypingIndicator";
-import { ChevronDown, Reply } from "lucide-react"; // Import thêm Reply icon
+import { ChevronDown, Reply, FileText } from "lucide-react";
 
 function ChatContainer() {
   const {
@@ -17,7 +17,7 @@ function ChatContainer() {
     isMessagesLoading,
     subscribeToMessages,
     unsubscribeFromMessages,
-    setReplyTo, // Thêm hàm để kích hoạt trạng thái trả lời
+    setReplyTo, 
   } = useChatStore();
   const { authUser } = useAuthStore();
   
@@ -26,29 +26,43 @@ function ChatContainer() {
   const [isTyping, setIsTyping] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
 
-  // 1. Lấy tin nhắn và đăng ký socket khi đổi người chat
+  // --- HELPER 1: Check if file is a video ---
+  const isVideoFile = (url) => {
+    if (!url) return false;
+    return url.match(/\.(mp4|webm|ogg|mov)$/i) || url.startsWith("data:video/");
+  };
+
+  // --- HELPER 2: Force Download for Cloudinary URLs ---
+  const getDownloadUrl = (url) => {
+    if (!url) return "#";
+    // If it is a Cloudinary URL, inject the 'fl_attachment' flag to force download
+    if (typeof url === 'string' && url.includes("cloudinary.com") && url.includes("/upload/")) {
+      return url.replace("/upload/", "/upload/fl_attachment/");
+    }
+    return url;
+  };
+
+  // 1. Fetch messages
   useEffect(() => {
     getMessagesByUserId(selectedUser._id);
     subscribeToMessages();
-
     return () => unsubscribeFromMessages();
   }, [selectedUser._id, getMessagesByUserId, subscribeToMessages, unsubscribeFromMessages]);
 
-  // 2. Tự động cuộn xuống khi có tin nhắn mới hoặc đối phương đang gõ
+  // 2. Auto scroll
   useEffect(() => {
     if (messageEndRef.current && messages.length > 0) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isTyping]);
 
-  // 3. Theo dõi sự kiện cuộn để hiển thị nút "Cuộn xuống đáy"
+  // 3. Scroll button logic
   useEffect(() => {
     const container = messagesContainerRef.current;
     if (!container) return;
 
     const handleScroll = () => {
       const { scrollTop, scrollHeight, clientHeight } = container;
-      // Nếu người dùng cuộn lên cách đáy hơn 150px thì hiện nút
       setShowScrollButton(scrollHeight - scrollTop - clientHeight > 150);
     };
 
@@ -68,17 +82,12 @@ function ChatContainer() {
 
   return (
     <div className="flex-1 flex flex-col min-h-0 relative w-full">
-      {/* HEADER CỐ ĐỊNH */}
       <ChatHeader />
       
-      {/* VÙNG CHỨA NỀN VÀ TIN NHẮN */}
       <div className="flex-1 relative overflow-hidden flex flex-col bg-gradient-to-b from-[#2F5F2F] via-[#4A7C4E] to-[#8B7355]">
         
-        {/* HIỆU ỨNG HẠT (STATIC BACKGROUND) 
-            Được đặt ở đây để luôn cố định tại khung nhìn, không bị trôi khi cuộn tin nhắn */}
         <FloatingParticles />
 
-        {/* VÙNG CUỘN TIN NHẮN (SCROLLABLE AREA) */}
         <div 
           ref={messagesContainerRef}
           className="flex-1 overflow-y-auto py-6 scroll-smooth relative z-10 bg-transparent"
@@ -90,10 +99,9 @@ function ChatContainer() {
                   key={msg._id}
                   className={`flex w-full group ${msg.senderId === authUser._id ? "justify-end" : "justify-start"}`}
                 >
-                  {/* Container bao bọc để hiển thị nút Reply khi hover */}
                   <div className={`flex items-center gap-2 ${msg.senderId === authUser._id ? "flex-row" : "flex-row-reverse"}`}>
                     
-                    {/* NÚT REPLY KIỂU MINECRAFT - Hiện khi hover */}
+                    {/* REPLY BUTTON */}
                     <button
                       onClick={() => setReplyTo(msg)}
                       className="opacity-0 group-hover:opacity-100 transition-all bg-[#C6C6C6] border-2 border-black p-1 shadow-mc active:translate-y-1 hover:bg-[#DEDEDE]"
@@ -102,12 +110,12 @@ function ChatContainer() {
                       <Reply size={16} className="text-black" />
                     </button>
 
-                    {/* Cửa sổ tin nhắn kiểu Minecraft */}
+                    {/* MESSAGE BUBBLE */}
                     <div className={`
                       relative border-4 border-black shadow-mc-lg w-auto max-w-[85%] min-w-[120px]
                       ${msg.senderId === authUser._id ? "bg-[#5E8E62]" : "bg-[#8B7355]"}
                     `}>
-                      {/* Thanh tiêu đề tin nhắn */}
+                      {/* TITLE BAR */}
                       <div className={`
                         flex items-center justify-between px-3 py-1 border-b-4 border-black
                         ${msg.senderId === authUser._id ? "bg-[#2F5F2F]" : "bg-[#5C4033]"}
@@ -126,28 +134,68 @@ function ChatContainer() {
                         </span>
                       </div>
 
-                      {/* Nội dung tin nhắn */}
+                      {/* MESSAGE CONTENT */}
                       <div className="p-4 bg-opacity-90">
                         
-                        {/* HIỂN THỊ NỘI DUNG TRÍCH DẪN (REPLY CONTEXT) - Theme Green */}
+                        {/* REPLY CONTEXT */}
                         {msg.replyTo && (
                           <div className="mb-3 bg-black/20 border-l-4 border-[#31251B] p-2 text-lg overflow-hidden">
                             <p className="font-bold text-[#FFD700] mb-0.5" style={{textShadow: '1px 1px 0 rgba(0,0,0,1)'}}>
                               @{msg.replyTo.senderId?.fullName || msg.replyTo.senderName || "User"}
                             </p>
                             <p className="text-white/70 line-clamp-2 italic leading-tight">
-                              {msg.replyTo.text || (msg.replyTo.image ? "Sent an image" : "...") }
+                              {msg.replyTo.text || (msg.replyTo.image ? "Sent an image" : (msg.replyTo.file ? "Sent a file" : "...")) }
                             </p>
                           </div>
                         )}
 
+                        {/* --- 1. IMAGE DISPLAY --- */}
                         {msg.image && (
                           <img 
                             src={msg.image} 
                             alt="Shared" 
-                            className="border-4 border-black mb-2 max-h-64 object-contain shadow-mc" 
+                            className="border-4 border-black mb-2 max-h-64 object-contain shadow-mc bg-black/20" 
                           />
                         )}
+
+                        {/* --- 2. FILE / VIDEO DISPLAY --- */}
+                        {msg.file && (
+                          <div className="mb-2">
+                             {isVideoFile(msg.file) ? (
+                                // VIDEO PLAYER
+                                <div className="border-4 border-black bg-black shadow-mc overflow-hidden">
+                                  <video 
+                                    src={msg.file} 
+                                    controls 
+                                    className="max-h-64 max-w-full w-full object-contain"
+                                  />
+                                </div>
+                             ) : (
+                                // FILE DOWNLOAD CARD (FIXED)
+                                <a 
+                                  href={getDownloadUrl(msg.file)} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  download // Hint to browser
+                                  className="flex items-center gap-3 bg-[#E3DAC9] p-2 border-4 border-black shadow-mc hover:bg-[#F0E6D2] transition-colors group/file text-black"
+                                >
+                                  <div className="w-10 h-10 bg-[#8B7355] border-2 border-black flex items-center justify-center shrink-0">
+                                    <FileText className="text-white w-6 h-6" />
+                                  </div>
+                                  <div className="flex flex-col overflow-hidden">
+                                    <span className="font-bold text-sm uppercase tracking-wide truncate">
+                                      Attached File
+                                    </span>
+                                    <span className="text-xs font-mono text-[#5C4033] underline">
+                                      Click to Download
+                                    </span>
+                                  </div>
+                                </a>
+                             )}
+                          </div>
+                        )}
+
+                        {/* --- 3. TEXT DISPLAY --- */}
                         {msg.text && (
                           <p className="text-2xl leading-tight text-white break-words whitespace-pre-wrap"
                             style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
@@ -172,12 +220,10 @@ function ChatContainer() {
           )}
         </div>
 
-        {/* TYPING INDICATOR (ABSOLUTE OVERLAY) */}
         <div className="absolute bottom-2 left-6 z-20 pointer-events-none">
            <TypingIndicator isTyping={isTyping} />
         </div>
 
-        {/* NÚT CUỘN NHANH (ABSOLUTE OVERLAY) */}
         {showScrollButton && (
           <button
             onClick={scrollToBottom}
