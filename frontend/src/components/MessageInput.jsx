@@ -200,7 +200,7 @@ useEffect(() => {
           }}
           className="flex-1 min-w-0 min-h-14 bg-[#4A7C4E] border-4 border-black px-4 py-2 text-white resize-none overflow-hidden
           text-2xl placeholder-[#a0c7a3] focus:outline-none shadow-mc-inner"
-          placeholder="Type a message..."
+          placeholder="Aa"
           style={{textShadow: '2px 2px 0 rgba(0,0,0,0.8)'}}
         />
 
