@@ -14,7 +14,7 @@ function ChatPage() {
   const isMobile = useIsMobile();
 
   return (
-    <div className="relative w-full max-w-6xl h-[800px]">
+    <div className="relative w-full max-w-6xl h-[95dvh] lg:h-[800px]">
       <BorderAnimatedContainer>
         {/* Main Content - ĐÃ SỬA: Thêm w-full để dãn hết chiều ngang */}
         <div className="flex w-full pt-0 h-full">
