@@ -4,6 +4,7 @@ import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import toast from "react-hot-toast";
 import { Send, X, Paperclip, FileText, Image as ImageIcon, Film } from "lucide-react"; 
+import useIsMobile from "../hooks/useIsMobile";
 
 function MessageInput({ onTyping }) {
   const { playRandomKeyStrokeSound } = useKeyboardSound();
@@ -18,6 +19,7 @@ function MessageInput({ onTyping }) {
   const { sendMessage, isSoundEnabled, replyTo, clearReplyTo, selectedUser } = useChatStore();
   const { authUser } = useAuthStore();
 
+  const isMobile = useIsMobile();
     // inside your component...
   const textareaRef = useRef(null);
 
@@ -193,7 +195,7 @@ useEffect(() => {
           value={text}
           onChange={handleInputChange}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
+            if (e.key === 'Enter' && !e.shiftKey && !isMobile) {
               e.preventDefault();
               handleSendMessage(e);
             }
