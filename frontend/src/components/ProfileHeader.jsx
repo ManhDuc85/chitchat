@@ -62,12 +62,12 @@ function ProfileHeader() {
 
           {/* USERNAME & ONLINE TEXT */}
           <div>
-            <h3 className="text-white font-bold text-2xl max-w-[180px] truncate" style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
+            <h3 className="text-white font-bold text-2xl max-w-[180px]" truncate style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
               {authUser.fullName}
             </h3>
             <div className="flex items-center gap-2 mt-1">
               <div className="w-2 h-2 bg-[#4CAF50] border border-black" />
-              <p className="text-white text-lg font-bold" style={{textShadow: '1px 1px 0 rgba(0,0,0,1)'}}>
+              <p className="text-white text-lg font-bold" truncate style={{textShadow: '1px 1px 0 rgba(0,0,0,1)'}}>
                 ONLINE
               </p>
             </div>

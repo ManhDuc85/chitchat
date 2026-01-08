@@ -179,7 +179,7 @@ function ChatContainer() {
                             <p className="font-bold text-[#FFD700] mb-0.5" style={{textShadow: '1px 1px 0 rgba(0,0,0,1)'}}>
                               @{msg.replyTo.senderId?.fullName || msg.replyTo.senderName || "User"}
                             </p>
-                            <p className="text-white/70 line-clamp-2 italic leading-tight">
+                            <p className="whitespace-pre-wrap text-white/70 line-clamp-2 italic leading-tight">
                               {msg.replyTo.text || (msg.replyTo.image ? "Sent an image" : msg.replyTo.video ? "Sent a video" : msg.replyTo.file ? "Sent a file" : "...") }
                             </p>
                           </div>

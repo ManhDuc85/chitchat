@@ -36,7 +36,7 @@ function ContactList() {
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#666] border-2 border-black" />
               )}
             </div>
-            <h4 className="text-white font-bold text-2xl" style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
+            <h4 className="text-white font-bold text-2xl" truncate style={{textShadow: '2px 2px 0 rgba(0,0,0,1)'}}>
               {contact.fullName}
             </h4>
           </div>

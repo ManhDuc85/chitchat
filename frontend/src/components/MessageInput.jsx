@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import useKeyboardSound from "../hooks/useKeyboardSound";
 import { useChatStore } from "../store/useChatStore";
 import { useAuthStore } from "../store/useAuthStore";
@@ -17,6 +17,25 @@ function MessageInput({ onTyping }) {
 
   const { sendMessage, isSoundEnabled, replyTo, clearReplyTo, selectedUser } = useChatStore();
   const { authUser } = useAuthStore();
+
+    // inside your component...
+  const textareaRef = useRef(null);
+
+  // 1. The Magic Function
+  const adjustHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Reset height to auto to shrink if text was deleted
+      textarea.style.height = "auto";
+      // Set height to the scroll height (content height)
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+// 2. Adjust height whenever the text changes
+useEffect(() => {
+  adjustHeight();
+}, [text]); // Runs every time 'text' state updates
 
   const handleSendMessage = (e) => {
     e.preventDefault();
@@ -168,8 +187,9 @@ function MessageInput({ onTyping }) {
       )}
 
       <div className="w-full flex gap-2">
-        <input
-          type="text"
+      <textarea
+          ref={textareaRef}
+          rows={1}
           value={text}
           onChange={handleInputChange}
           onKeyDown={(e) => {
@@ -178,7 +198,8 @@ function MessageInput({ onTyping }) {
               handleSendMessage(e);
             }
           }}
-          className="flex-1 min-w-0 bg-[#4A7C4E] border-4 border-black px-4 py-2 text-white text-2xl placeholder-[#a0c7a3] focus:outline-none shadow-mc-inner"
+          className="flex-1 min-w-0 min-h-14 bg-[#4A7C4E] border-4 border-black px-4 py-2 text-white resize-none overflow-hidden
+          text-2xl placeholder-[#a0c7a3] focus:outline-none shadow-mc-inner"
           placeholder="Type a message..."
           style={{textShadow: '2px 2px 0 rgba(0,0,0,0.8)'}}
         />
